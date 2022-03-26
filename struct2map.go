@@ -1,9 +1,10 @@
-package structmap
+package struct2map
 
 import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 )
 
 const (
@@ -15,6 +16,8 @@ const (
 	OptOmitempty = "omitempty"
 	OptDive      = "dive"
 	OptWildcard  = "wildcard"
+
+	timeLayout = "2006-01-02 15:04:05"
 )
 
 const (
@@ -52,6 +55,7 @@ func StructToMap(s interface{}, tag string, methodName string) (res map[string]i
 		if fieldType.PkgPath != "" {
 			continue
 		}
+
 		// read tag
 		tagVal, flag := readTag(fieldType, tag)
 
@@ -60,6 +64,14 @@ func StructToMap(s interface{}, tag string, methodName string) (res map[string]i
 		}
 
 		fieldValue := v.Field(i)
+		if fieldType.Type.String() == "time.Time" || fieldType.Type.String() == "Time" {
+			vt := fieldValue.Interface().(time.Time)
+			vtstr := vt.Format(timeLayout)
+			if vtstr != "0001-01-01 00:00:00" {
+				res[tagVal] = vtstr
+			}
+			continue
+		}
 		if flag&flagOmiEmpty != 0 && fieldValue.IsZero() {
 			continue
 		}
@@ -78,7 +90,7 @@ func StructToMap(s interface{}, tag string, methodName string) (res map[string]i
 			if methodName != "" {
 				_, ok := fieldValue.Type().MethodByName(methodName)
 				if ok {
-					key, value, err := callFunc(fieldValue, methodName)
+					key, value, err := callFunc(fieldType.Type.String(), fieldValue, methodName)
 					if err != nil {
 						return nil, err
 					}
@@ -91,7 +103,7 @@ func StructToMap(s interface{}, tag string, methodName string) (res map[string]i
 			if methodName != "" {
 				_, ok := fieldValue.Type().MethodByName(methodName)
 				if ok {
-					key, value, err := callFunc(fieldValue, methodName)
+					key, value, err := callFunc(fieldType.Type.String(), fieldValue, methodName)
 					if err != nil {
 						return nil, err
 					}
@@ -172,7 +184,7 @@ func readTag(f reflect.StructField, tag string) (string, int) {
 }
 
 // call function
-func callFunc(fv reflect.Value, methodName string) (string, interface{}, error) {
+func callFunc(fieldType string, fv reflect.Value, methodName string) (string, interface{}, error) {
 	methodRes := fv.MethodByName(methodName).Call([]reflect.Value{})
 	if len(methodRes) != methodResNum {
 		return "", nil, fmt.Errorf("wrong method %s, should have 2 output: (string,interface{})", methodName)

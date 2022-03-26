@@ -37,10 +37,6 @@ type Profile struct {
 	Date       time.Time `map:"time"`
 }
 
-// its own toMap method
-func (p Profile) StructToMap() (key string, value interface{}) {
-	return "time", p.Date.Format(timeLayout)
-}
 ```
 使用
 ```go

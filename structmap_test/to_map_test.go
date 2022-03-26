@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/liangyaopei/structmap"
+	"github.com/stormeye/struct2map"
 )
 
 const timeLayout = "2006-01-02 15:04:05"
@@ -15,11 +15,6 @@ const timeLayout = "2006-01-02 15:04:05"
 type Profile struct {
 	Experience string    `map:"experience"`
 	Date       time.Time `map:"time"`
-}
-
-// its own toMap method
-func (p Profile) StructToMap() (key string, value interface{}) {
-	return "time", p.Date.Format(timeLayout)
 }
 
 type MySlice []int
@@ -66,6 +61,7 @@ type User struct {
 	Arr         []int        `map:"arr,omitempty"`           // normal slice
 	MyArr       MySlice      `map:"my_arr,omitempty"`        // slice implements its own method
 	IgnoreFiled string       `map:"-"`
+	CreateTime  time.Time    `map:"create_time,omitempty"`
 }
 
 func newUser() User {
