@@ -67,7 +67,6 @@ func StructToMap(s interface{}, tag string, methodName string) (res map[string]i
 		if fieldType.Type.String() == "time.Time" || fieldType.Type.String() == "Time" {
 			vt := fieldValue.Interface().(time.Time)
 			vtstr := vt.Format(timeLayout)
-			vtstr = vtstr[:20]
 			if vtstr != "0001-01-01 00:00:00" {
 				res[tagVal] = vtstr
 			}
