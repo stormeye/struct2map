@@ -1,3 +1,3 @@
-module github.com/liangyaopei/structmap
+module github.com/stormeye/struct2map
 
 go 1.14
