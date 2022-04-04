@@ -1,6 +1,7 @@
 package struct_to_map_test
 
 import (
+	"database/sql"
 	"encoding/json"
 	"strconv"
 	"strings"
@@ -52,16 +53,19 @@ type StructNoDive struct {
 
 // User is used for demonstration
 type User struct {
-	Name        string       `map:"name,omitempty,wildcard"` // string
-	Email       *string      `map:"email_ptr,omitempty"`     // pointer
-	MyGender    Gender       `map:"gender,omitempty"`        // type alias
-	Github      GithubPage   `map:"github,dive,omitempty"`   // struct dive
-	NoDive      StructNoDive `map:"no_dive,omitempty"`       // no dive struct
-	MyProfile   Profile      `map:"my_profile,omitempty"`    // struct implements its own method
-	Arr         []int        `map:"arr,omitempty"`           // normal slice
-	MyArr       MySlice      `map:"my_arr,omitempty"`        // slice implements its own method
-	IgnoreFiled string       `map:"-"`
-	CreateTime  time.Time    `map:"create_time,omitempty"`
+	Name        string         `map:"name,omitempty,wildcard"` // string
+	Email       *string        `map:"email_ptr,omitempty"`     // pointer
+	MyGender    Gender         `map:"gender,omitempty"`        // type alias
+	Github      GithubPage     `map:"github,dive,omitempty"`   // struct dive
+	NoDive      StructNoDive   `map:"no_dive,omitempty"`       // no dive struct
+	MyProfile   Profile        `map:"my_profile,omitempty"`    // struct implements its own method
+	Arr         []int          `map:"arr,omitempty"`           // normal slice
+	MyArr       MySlice        `map:"my_arr,omitempty"`        // slice implements its own method
+	IgnoreFiled string         `map:"-"`
+	CreateTime  time.Time      `map:"create_time,omitempty"`
+	DeleteTime  sql.NullTime   `map:"delete_time"` // 删除时间
+	PurePhone   sql.NullString `map:"pure_phone"`  // 手机号
+
 }
 
 func newUser() User {
@@ -98,7 +102,7 @@ func TestStructToMap(t *testing.T) {
 	user := newUser()
 	tag := "map"
 	methodName := "StructToMap"
-	res, err := structmap.StructToMap(&user, tag, methodName)
+	res, err := struct2map.StructToMap(&user, tag, methodName)
 	if err != nil {
 		t.Errorf("struct to map:%s", err.Error())
 		return
@@ -140,6 +144,6 @@ func BenchmarkStructToMapByToMap(b *testing.B) {
 	methodName := ""
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		structmap.StructToMap(&user, tag, methodName)
+		struct2map.StructToMap(&user, tag, methodName)
 	}
 }

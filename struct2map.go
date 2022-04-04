@@ -1,6 +1,7 @@
 package struct2map
 
 import (
+	"database/sql"
 	"fmt"
 	"reflect"
 	"strings"
@@ -64,11 +65,29 @@ func StructToMap(s interface{}, tag string, methodName string) (res map[string]i
 		}
 
 		fieldValue := v.Field(i)
+		println(fieldType.Type.String())
 		if fieldType.Type.String() == "time.Time" || fieldType.Type.String() == "Time" {
 			vt := fieldValue.Interface().(time.Time)
 			vtstr := vt.Format(timeLayout)
 			if vtstr != "0001-01-01 00:00:00" {
 				res[tagVal] = vtstr
+			}
+			continue
+		}
+		if fieldType.Type.String() == "sql.NullTime" {
+			vt := fieldValue.Interface().(sql.NullTime)
+			if vt.Valid {
+				vtstr := vt.Time.Format(timeLayout)
+				if vtstr != "0001-01-01 00:00:00" {
+					res[tagVal] = vt.Time
+				}
+			}
+			continue
+		}
+		if fieldType.Type.String() == "sql.NullString" {
+			vt := fieldValue.Interface().(sql.NullString)
+			if vt.Valid {
+				res[tagVal] = vt.String
 			}
 			continue
 		}
