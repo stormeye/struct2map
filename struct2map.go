@@ -65,7 +65,6 @@ func StructToMap(s interface{}, tag string, methodName string) (res map[string]i
 		}
 
 		fieldValue := v.Field(i)
-		println(fieldType.Type.String())
 		if fieldType.Type.String() == "time.Time" || fieldType.Type.String() == "Time" {
 			vt := fieldValue.Interface().(time.Time)
 			vtstr := vt.Format(timeLayout)
