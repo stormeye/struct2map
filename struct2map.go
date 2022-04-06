@@ -90,6 +90,48 @@ func StructToMap(s interface{}, tag string, methodName string) (res map[string]i
 			}
 			continue
 		}
+		if fieldType.Type.String() == "sql.NullInt64" {
+			vt := fieldValue.Interface().(sql.NullInt64)
+			if vt.Valid {
+				res[tagVal] = vt.Int64
+			}
+			continue
+		}
+		if fieldType.Type.String() == "sql.NullInt32" {
+			vt := fieldValue.Interface().(sql.NullInt32)
+			if vt.Valid {
+				res[tagVal] = vt.Int32
+			}
+			continue
+		}
+		if fieldType.Type.String() == "sql.NullInt16" {
+			vt := fieldValue.Interface().(sql.NullInt16)
+			if vt.Valid {
+				res[tagVal] = vt.Int16
+			}
+			continue
+		}
+		if fieldType.Type.String() == "sql.NullBool" {
+			vt := fieldValue.Interface().(sql.NullBool)
+			if vt.Valid {
+				res[tagVal] = vt.Bool
+			}
+			continue
+		}
+		if fieldType.Type.String() == "sql.NullByte" {
+			vt := fieldValue.Interface().(sql.NullByte)
+			if vt.Valid {
+				res[tagVal] = vt.Byte
+			}
+			continue
+		}
+		if fieldType.Type.String() == "sql.NullFloat64" {
+			vt := fieldValue.Interface().(sql.NullFloat64)
+			if vt.Valid {
+				res[tagVal] = vt.Float64
+			}
+			continue
+		}
 		if flag&flagOmiEmpty != 0 && fieldValue.IsZero() {
 			continue
 		}
